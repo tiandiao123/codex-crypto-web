@@ -62,6 +62,12 @@ cryptoweb/
 sudo docker-compose up -d --build
 ```
 
+或使用一键脚本：
+
+```bash
+./start.sh
+```
+
 查看服务状态：
 
 ```bash
