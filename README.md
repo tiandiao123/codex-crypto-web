@@ -1,50 +1,83 @@
-# Crypto Web - 实时加密货币数据网站
+# Crypto Web - 实时加密货币价格看板
 
-> 🤖 这是一个由多 Agent 协作开发的项目
+实时展示 BTC / ETH / SOL 价格、24H 趋势与加密新闻，前后端通过 Socket.IO 实时推送数据。
 
-## 项目简介
+## 项目效果
 
-实时展示加密货币价格和新闻动态的 Web 应用。
+![Crypto Web Dashboard](./crypto3.png)
 
-| 功能 | 描述 | 更新频率 |
-|-----|------|---------|
-| 实时价格 | BTC、ETH 等主流币价格 | 5 秒 |
-| 趋势图表 | 24小时价格走势 | 实时 |
-| 新闻聚合 | 加密行业最新动态 | 15 分钟 |
+## 功能
+
+- 实时价格卡片（BTC / ETH / SOL）
+- 24小时价格走势切换图表
+- 新闻流实时推送
+- 连接状态显示（连接中 / 已连接 / 断开）
+- REST API + WebSocket 双通道
 
 ## 技术栈
 
-- **前端**: React + TypeScript + Tailwind + Recharts
-- **后端**: Python + FastAPI + WebSocket
-- **数据**: Python 爬虫 + Redis 缓存
-
-## 开发模式
-
-本项目采用 **OpenClaw + 多 Codex Agent** 协作开发：
-
-```
-OpenClaw (协调者)
-    ├── 前端 Agent (Codex) → frontend/
-    ├── 后端 Agent (Codex) → backend/
-    └── 数据 Agent (Codex) → data/
-```
-
-详细架构说明见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- 前端：React 18 + TypeScript + Tailwind + Recharts + Vite
+- 后端：FastAPI + python-socketio + Redis
+- 数据：Binance WebSocket + RSS 聚合 + APScheduler
+- 部署：Docker Compose
 
 ## 目录结构
 
-```
+```text
 cryptoweb/
-├── docs/           # 文档
-├── frontend/       # React 前端
-├── backend/        # FastAPI 后端
-└── data/           # 爬虫和数据处理
+├── frontend/        # React 前端
+├── backend/         # FastAPI + Socket.IO
+├── data/            # 数据采集与调度
+├── docs/            # 架构与部署文档
+├── docker-compose.yml
+└── project.md       # 详细项目说明与排查指南
 ```
 
-## 快速开始
+## 快速启动（推荐）
 
-> 待 Agent 开发完成后补充
+在项目根目录执行：
+
+```bash
+sudo docker-compose up -d --build
+```
+
+查看服务状态：
+
+```bash
+sudo docker-compose ps
+```
+
+## 访问地址
+
+- 前端：`http://localhost:5173`
+- 后端健康检查：`http://localhost:8000/api/health`
+
+如果是远程服务器部署，请将 `localhost` 换成服务器公网 IP，例如：
+
+- `http://118.26.39.18:5173`
+- `http://118.26.39.18:8000/api/health`
+
+## 启动成功判定
+
+满足以下条件即代表链路正常：
+
+1. `crypto-redis`、`crypto-data`、`crypto-backend`、`crypto-frontend-dev` 均为 `Up`
+2. `GET /api/health` 返回 `{"status":"ok","redis":"up"}`
+3. 前端右上角显示 `WebSocket: 已连接`
+4. 页面价格和新闻自动刷新
+
+## 常见问题
+
+- 页面一直“连接中”：优先检查 `8000` 端口是否放通（云安全组/防火墙）
+- 公网打不开：确认云服务器入站规则已放行 `5173/tcp`、`8000/tcp`
+- `docker-compose` 报 `ContainerConfig`：删除异常容器后重启服务
+
+## 停止服务
+
+```bash
+sudo docker-compose down
+```
 
 ---
 
-*多 Agent 协作开发中...*
+更多说明见 [project.md](./project.md) 与 [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
