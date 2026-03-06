@@ -12,7 +12,28 @@
 - 24小时价格走势切换图表
 - 新闻流实时推送
 - 连接状态显示（连接中 / 已连接 / 断开）
+- 市场指标卡片（期权 + 宏观）
 - REST API + WebSocket 双通道
+
+## 市场指标（新增）
+
+首页新增了“市场指标（期权 + 宏观）”模块，默认每 30 秒刷新一次，包含：
+
+- 期权数据（Deribit 公共 API）
+	- BTC Call Open Interest
+	- BTC Put Open Interest
+	- BTC Put/Call Ratio
+	- ETH Total Open Interest
+- 宏观指标
+	- DXY（美元指数）
+	- US10Y（10年期美债收益率）
+	- ES / NQ（标普与纳指期货）
+	- BTC Dominance（CoinGecko）
+	- Fear & Greed（Alternative.me）
+
+后端提供统一接口：
+
+- `GET /api/market-metrics`
 
 ## 技术栈
 
