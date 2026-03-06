@@ -1,0 +1,16 @@
+已完成功能列表：
+1. 搭建 FastAPI + Socket.IO + Redis 后端项目结构。
+2. 实现 Socket.IO 端点 /socket.io/，支持多客户端连接。
+3. 实现价格变化实时推送事件 price_update。
+4. 实现新闻更新推送事件 news_update。
+5. 实现 REST API：
+   - GET /api/prices
+   - GET /api/prices/{symbol}
+   - GET /api/prices/{symbol}/history?range=24h
+   - GET /api/news
+   - GET /api/health
+6. 从 Redis Hash crypto:prices 读取价格数据。
+7. 从 Redis List crypto:news 读取新闻数据。
+8. 配置 CORS，允许 http://localhost:5173。
+9. 增加日志记录与错误处理。
+10. 提供 requirements.txt 和 README.md 运行说明。

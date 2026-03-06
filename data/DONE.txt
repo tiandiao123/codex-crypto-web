@@ -1,0 +1,12 @@
+1. 已实现 Binance WebSocket 实时交易价格采集（BTC/ETH/SOL）
+2. 已实现 Binance REST 24h 涨跌幅采集并合并写入实时价格
+3. 已实现实时价格写入 Redis Hash（crypto:prices）
+4. 已实现每分钟价格快照写入 Redis Sorted Set（crypto:history:{SYMBOL}）
+5. 已实现历史数据仅保留最近 24 小时
+6. 已实现每 15 分钟抓取 Cointelegraph 与 CoinDesk RSS
+7. 已实现新闻解析、去重、写入 Redis List（crypto:news）并保留最新 50 条
+8. 已实现价格格式化到 2 位小数
+9. 已实现时间统一为 UTC
+10. 已实现 APScheduler 统一调度
+11. 已实现异常处理、日志记录、WebSocket 重连机制
+12. 已提供 requirements.txt 与 README.md 运行说明

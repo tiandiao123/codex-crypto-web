@@ -1,0 +1,11 @@
+1. 搭建 React 18 + TypeScript(严格模式) + Vite 项目结构
+2. 集成 Tailwind CSS 并完成全局暗色主题样式
+3. 实现 useWebSocket Hook，连接 ws://localhost:8000
+4. 监听 price_update 事件并维护 BTC/ETH/SOL 实时价格与24小时历史
+5. 监听 news_update 事件并维护新闻流列表（去重+按时间排序）
+6. 实现 ConnectionStatus 组件，显示连接状态并支持自动重连状态反馈
+7. 实现 PriceCard 组件，展示币种图标、价格、24h涨跌幅、更新时间
+8. 实现 PriceChart 组件，使用 Recharts AreaChart 展示24小时趋势并支持切换币种
+9. 实现 NewsFeed 组件，展示新闻标题、来源、发布时间并支持跳转原文
+10. 实现 App 页面布局，完成主面板+右侧新闻栏整体集成
+11. 提供 package.json 完整依赖与 README 运行说明

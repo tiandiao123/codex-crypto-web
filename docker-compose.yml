@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: crypto-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # 数据爬虫服务
+  data-crawler:
+    build:
+      context: ./data
+      dockerfile: Dockerfile
+    container_name: crypto-data
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    restart: unless-stopped
+    volumes:
+      - ./data:/app
+    # 保持容器运行
+    tty: true
+
+  # 后端 API 服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: crypto-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - data-crawler
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CORS_ORIGINS=*
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+
+  # 前端 (开发模式)
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: crypto-frontend-dev
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_WS_URL=
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    restart: unless-stopped
+
+  # 前端 (生产模式构建)
+  # 取消注释使用生产模式
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  ###############################################################
+  # Crypto Web - Docker Compose 配置
+  ###############################################################
+  
+  # 如需生产部署，建议使用 frontend-nginx 服务配合反向代理
+
+volumes:
+  redis-data:
