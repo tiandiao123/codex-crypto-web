@@ -7,7 +7,8 @@ import logging
 from fastapi import APIRouter, HTTPException, Query
 from redis.exceptions import RedisError
 
-from app.models import HealthResponse, PriceHistoryResponse
+from app.market_metrics import market_metrics_client
+from app.models import HealthResponse, MarketMetricsResponse, PriceHistoryResponse
 from app.redis_client import redis_client
 
 logger = logging.getLogger(__name__)
@@ -77,3 +78,13 @@ async def health_check() -> HealthResponse:
         return HealthResponse(status="degraded", redis="down")
 
     return HealthResponse(status="ok", redis="up" if is_ok else "down")
+
+
+@router.get("/market-metrics", response_model=MarketMetricsResponse)
+async def get_market_metrics() -> MarketMetricsResponse:
+    """Return aggregated options and macro market indicators."""
+    try:
+        return await market_metrics_client.get_market_metrics()
+    except Exception as exc:
+        logger.exception("Market metrics fetch failed")
+        raise HTTPException(status_code=503, detail="Market metrics unavailable") from exc

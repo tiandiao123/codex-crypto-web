@@ -53,3 +53,38 @@ class HealthResponse(BaseModel):
 
     status: str
     redis: str
+
+
+class OptionMetrics(BaseModel):
+    """Aggregated crypto options metrics."""
+
+    btc_call_open_interest: float = 0
+    btc_put_open_interest: float = 0
+    btc_put_call_ratio: float = 0
+    eth_total_open_interest: float = 0
+
+
+class MacroIndicator(BaseModel):
+    """One macro indicator quote and its percentage change."""
+
+    value: float | None = None
+    change_pct: float | None = None
+
+
+class MacroMetrics(BaseModel):
+    """Macro and cross-market indicators."""
+
+    dxy: MacroIndicator
+    us10y: MacroIndicator
+    sp500_futures: MacroIndicator
+    nasdaq_futures: MacroIndicator
+    btc_dominance: float | None = None
+    fear_greed_index: float | None = None
+
+
+class MarketMetricsResponse(BaseModel):
+    """Unified market metrics payload for frontend dashboard."""
+
+    options: OptionMetrics
+    macro: MacroMetrics
+    updated_at: int

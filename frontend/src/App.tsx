@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { ConnectionStatus } from './components/ConnectionStatus';
+import { MarketMetrics } from './components/MarketMetrics';
 import { NewsFeed } from './components/NewsFeed';
 import { PriceCard } from './components/PriceCard';
 import { PriceChart } from './components/PriceChart';
+import { useMarketMetrics } from './hooks/useMarketMetrics';
 import { useWebSocket } from './hooks/useWebSocket';
 import type { CryptoSymbol } from './types';
 
@@ -10,6 +12,7 @@ import type { CryptoSymbol } from './types';
 function App() {
   const [selectedSymbol, setSelectedSymbol] = useState<CryptoSymbol>('BTC');
   const { connectionState, prices, priceHistory, news } = useWebSocket();
+  const { metrics, loading: metricsLoading } = useMarketMetrics();
 
   const cards = useMemo<CryptoSymbol[]>(() => ['BTC', 'ETH', 'SOL'], []);
 
@@ -23,6 +26,10 @@ function App() {
           </div>
           <ConnectionStatus state={connectionState} />
         </header>
+
+        <div className="mb-6">
+          <MarketMetrics data={metrics} loading={metricsLoading} />
+        </div>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
           <section className="space-y-6 xl:col-span-8">
