@@ -4,7 +4,7 @@
 
 ## 项目效果
 
-![Crypto Web Dashboard](./crypto3.png)
+![Crypto Web Dashboard](./website.png)
 
 ## 功能
 
