@@ -14,6 +14,7 @@ Crypto Web 是一个实时加密货币数据看板，包含三部分服务：
 - 实时价格推送（`price_update`）
 - 新闻推送（`news_update`）
 - REST 查询（`/api/prices`、`/api/news`、`/api/health`）
+- 市场指标聚合（`/api/market-metrics`）
 
 ---
 
@@ -138,9 +139,74 @@ sudo docker-compose up -d backend frontend-dev
 - `Binance WebSocket 已连接`
 - `新闻聚合完成`
 
+### Q5：市场指标部分显示 `--`
+
+可能是上游公共接口限流或短时不可用，系统会自动降级到备用源。
+
+- 期权源：Deribit 公共 API
+- 宏观主源：Yahoo Finance
+- 宏观备用源：Stooq（DXY/ES/NQ）、FRED（US10Y）
+- 其他：CoinGecko（BTC Dominance）、Alternative.me（Fear & Greed）
+
+可先检查：
+
+```bash
+curl http://127.0.0.1:8000/api/market-metrics
+```
+
+若接口返回但部分字段为 `null`，通常是源站限流，等待下一轮轮询或稍后重试即可。
+
 ---
 
-## 8. 停止服务
+## 8. 市场指标模块说明（新增）
+
+首页新增“市场指标（期权 + 宏观）”区域，默认每 30 秒刷新。
+
+### 8.1 指标清单
+
+1. 期权数据
+   - BTC Call Open Interest
+   - BTC Put Open Interest
+   - BTC Put/Call Ratio
+   - ETH Total Open Interest
+
+2. 宏观数据
+   - DXY（美元指数）
+   - US10Y（10年期美债收益率）
+   - ES / NQ（标普 / 纳指期货）
+   - BTC Dominance
+   - Fear & Greed
+
+### 8.2 接口说明
+
+- 路径：`GET /api/market-metrics`
+- 示例返回：
+
+```json
+{
+  "options": {
+    "btc_call_open_interest": 277626.4,
+    "btc_put_open_interest": 200388.9,
+    "btc_put_call_ratio": 0.7218,
+    "eth_total_open_interest": 2280329.0
+  },
+  "macro": {
+    "dxy": { "value": 98.962, "change_pct": -0.0384 },
+    "us10y": { "value": 4.09, "change_pct": null },
+    "sp500_futures": { "value": 6847.75, "change_pct": 0.3223 },
+    "nasdaq_futures": { "value": 25127.5, "change_pct": 0.4457 },
+    "btc_dominance": 57.02,
+    "fear_greed_index": 18.0
+  },
+  "updated_at": 1772783200
+}
+```
+
+---
+
+## 9. 停止服务
+
+---
 
 ```bash
 sudo docker-compose down
@@ -148,7 +214,7 @@ sudo docker-compose down
 
 ---
 
-## 9. 安全建议（生产）
+## 10. 安全建议（生产）
 
 - 不要将 Redis（6379）暴露公网
 - 使用 Nginx/HTTPS 反向代理前后端
