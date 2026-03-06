@@ -7,6 +7,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 // 从环境变量获取后端地址，默认使用当前主机
 const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:8000`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8000`;
 
 interface WrappedEvent<T> {
   type?: string;
@@ -111,6 +112,31 @@ export const useWebSocket = () => {
         return merged.slice(0, 20);
       });
     });
+
+    const loadInitialNews = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/news`);
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as NewsItem[];
+        setNews((prev) => {
+          const mergedMap = new Map<string, NewsItem>();
+          [...data, ...prev].forEach((item) => {
+            mergedMap.set(item.id, item);
+          });
+
+          return [...mergedMap.values()]
+            .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+            .slice(0, 20);
+        });
+      } catch {
+        // Ignore transient fetch errors.
+      }
+    };
+
+    void loadInitialNews();
 
     return () => {
       socket.disconnect();

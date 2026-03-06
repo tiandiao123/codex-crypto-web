@@ -42,8 +42,20 @@ _stop_event: asyncio.Event | None = None
 
 @sio.event
 async def connect(sid: str, environ: dict, auth: dict | None = None) -> None:
-    """Handle client connection."""
+    """Handle client connection and send initial snapshots."""
     logger.info("Socket client connected: %s", sid)
+
+    try:
+        prices = await redis_client.get_all_prices()
+        for price_data in prices.values():
+            await sio.emit("price_update", price_data.model_dump(), to=sid)
+
+        news_items = await redis_client.get_news(limit=20)
+        # Send older first to preserve timeline rendering.
+        for item in reversed(news_items):
+            await sio.emit("news_update", item.model_dump(), to=sid)
+    except Exception:
+        logger.exception("Failed to send initial socket snapshots to %s", sid)
 
 
 @sio.event
